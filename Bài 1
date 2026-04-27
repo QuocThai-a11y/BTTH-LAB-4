@@ -1,0 +1,93 @@
+#ifndef SOPHUC_H
+#define SOPHUC_H 
+#include <iostream>
+using namespace std;
+
+class SoPhuc{
+    private:
+
+    double thuc ;
+    double ao ;
+
+    public: 
+    SoPhuc(double soThuc = 0 , double soAo = 0 ) : thuc(soThuc) , ao(soAo) {}
+
+    friend istream& operator>>(istream& is , SoPhuc& sp) ;
+    friend ostream& operator<<(ostream& os , const SoPhuc& sp) ;
+    SoPhuc operator+(const SoPhuc& sp) const ;
+    SoPhuc operator-(const SoPhuc& sp) const ;
+    SoPhuc operator*(const SoPhuc& sp) const ;
+    SoPhuc operator/(const SoPhuc& sp) const ;
+    bool operator==(const SoPhuc& sp) const ;
+    bool operator!=(const SoPhuc& sp) const ;
+
+};
+#endif
+
+#include "SoPhuc.h"
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+istream& operator>>(istream& is , SoPhuc& sp){
+    is>>sp.thuc>>sp.ao ;
+    return is ;
+}
+ostream& operator<<(ostream& os , SoPhuc& sp){
+    if(sp.ao == 0){
+        os << sp.thuc << endl ;
+        return os ;
+    }
+    else if(sp.ao < 0){ 
+        os << sp.thuc << " - " << abs(sp.ao)<<"i" << endl ;
+        return os ;
+    }
+    else{
+        os << sp.thuc << " + " << sp.ao <<"i"<< endl ;   
+        return os ;
+    }
+    
+    
+}
+SoPhuc SoPhuc::operator+(const SoPhuc& sp) const {
+    return SoPhuc(this->thuc + sp.thuc, this->thuc + sp.ao) ;
+}
+
+SoPhuc SoPhuc::operator-(const SoPhuc& sp) const {
+    return SoPhuc(this->thuc - sp.thuc, this->thuc - sp.ao) ;
+}
+
+SoPhuc SoPhuc::operator*(const SoPhuc& sp) const {
+    double PhanThuc = this->thuc*sp.thuc - this->ao*sp.ao ;
+    double PhanAo = this->thuc*sp.ao + this->ao*sp.thuc ;
+    return SoPhuc(PhanThuc, PhanAo) ;
+}
+
+SoPhuc SoPhuc::operator/(const SoPhuc& sp) const {
+    double PhanMau = sp.thuc*sp.thuc + sp.ao*sp.ao ;
+    if( PhanMau == 0 ){
+        throw
+    }
+}
+
+bool SoPhuc::operator==(const SoPhuc& sp) const {
+    return(this->thuc == sp.thuc && this->ao == sp.ao) ;
+}
+bool SoPhuc::operator!=(const SoPhuc& sp) const {
+    return !(this->thuc == sp.thuc && this->ao == sp.ao) ;
+}
+int main(){
+    SoPhuc sp1 , sp2 , sp3 ;
+    cin >> sp1 >> sp2 ;
+    cout << sp3 = sp1 + sp2 ;
+    
+    cout << sp3 = sp1 - sp2 ;
+    
+    cout << sp3 = sp1 * sp2 ;
+    
+    if( sp1 == sp2) cout << " hai so phuc 1 va 2 bang nhau " << endl ;
+    
+    else if( sp1 != sp2 ) cout<< " hai so phuc 1 va 2 khong bang nhau " << endl ;
+    
+    return 0;
+}
