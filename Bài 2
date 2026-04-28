@@ -1,0 +1,173 @@
+#ifndef PHANSO_H
+#define PHANSO_H
+#include <iostream>
+using namespace std;
+
+class PhanSo{
+    private:
+    
+    int tu ;
+    int mau ;
+    
+    int UCLN(int a , int b) const ;
+    public:
+    
+    PhanSo( int TuSo = 1 , int MauSo = 1): tu(TuSo), mau(MauSo){}
+    
+    friend istream& operator>>(istream& is , PhanSo& ps) ;
+    friend ostream& operator<<(ostream& os , const PhanSo& ps) ;
+    
+    void RutGon() ;
+    
+    PhanSo operator+(const PhanSo& ps) const;
+    PhanSo operator-(const PhanSo& ps) const;
+    PhanSo operator*(const PhanSo& ps) const;
+    PhanSo operator/(const PhanSo& ps) const;
+    bool operator==(const PhanSo& ps) const;
+    bool operator>(const PhanSo& ps) const;
+    bool operator<(const PhanSo& ps) const;
+};
+#endif
+
+#include <iostream>
+#include <cmath>
+#include <stdexcept>
+#include "PhanSo.h"
+using namespace std;
+
+istream& operator>>(istream& is , PhanSo& ps){
+    is >> ps.tu >> ps.mau ;
+    if(ps.mau == 0){
+        throw runtime_error(" Mau so khong the bang 0 ") ;
+    }
+    return is ;
+}
+
+ostream& operator<<(ostream& os , const PhanSo& ps){
+    os << ps.tu << "/" << ps.mau ;
+    return os ;
+}
+
+int PhanSo::UCLN(int a , int b ) const {
+    a = abs(a) ;
+    b = abs(b) ;
+    while( b != 0 ){
+        int temp = a % b ;
+        a = b ;
+        b = temp ;
+    }
+    return a ;
+}
+
+void PhanSo::RutGon() {
+    if (tu == 0) {
+        mau = 1; // Phân số 0/x luôn là 0/1
+        return;
+    }
+    int uoc = UCLN(tu, mau);
+    tu /= uoc;
+    mau /= uoc;
+
+    // Đảm bảo mẫu số luôn dương
+    if (mau < 0) {
+        tu = -tu;
+        mau = -mau;
+    }
+}
+
+PhanSo PhanSo::operator+(const PhanSo& ps) const {  // Ham Tong hai phan so 
+    PhanSo other ;
+    other.mau = ps.mau* this->mau ;
+    other.tu = this->tu*ps.mau + ps.tu*this->mau ;
+    
+    other.RutGon() ;
+    
+    return PhanSo(other.tu, other.mau) ;
+}
+
+PhanSo PhanSo::operator-(const PhanSo& ps) const {   // ham hieu hai phan so
+    PhanSo other ;
+    other.mau = ps.mau* this->mau ;
+    other.tu = this->tu*ps.mau - ps.tu*this->mau ;
+    
+    other.RutGon() ;
+    
+    return PhanSo(other.tu, other.mau) ;
+}
+
+PhanSo PhanSo::operator*(const PhanSo& ps) const {   // Ham tich hai phan so
+    PhanSo other ;
+    other.tu = this->tu*ps.tu ;
+    other.mau = this->mau*ps.mau ;
+    
+    other.RutGon() ;
+    return PhanSo(other.tu, other.mau) ;
+}
+
+PhanSo PhanSo::operator/(const PhanSo& ps) const {   // Ham thuong hai phan so
+    PhanSo other ;
+    if( ps.tu == 0){
+        throw runtime_error("Khong the chia cho phan so bang 0") ;
+    }
+    other.tu = this->tu*ps.mau ;
+    other.mau = this->mau*ps.tu ;
+    
+    other.RutGon() ;
+    return PhanSo(other.tu, other.mau) ;
+}
+
+bool PhanSo::operator==(const PhanSo& ps) const { // Ham so sanh hai phan so ==
+    return (this->tu * ps.mau  == this->mau * ps.tu ) ;
+}
+
+bool PhanSo::operator>(const PhanSo& ps) const {   // Ham so sanh hai phan so >
+    long long tu1 = (long long)this->tu * ps.mau;
+    long long tu2 = (long long)ps.tu * this->mau;
+     if (tu1 > tu2) return true ;
+     else return false ;
+}
+
+bool PhanSo::operator<(const PhanSo& ps) const {  // Ham so sanh hai phan so <
+    long long tu1 = (long long)this->tu * ps.mau;
+    long long tu2 = (long long)ps.tu * this->mau;
+     if (tu1 < tu2) return true ;
+     else return false ;
+}
+int main()
+{
+    PhanSo ps1, ps2, ps3 ;
+    // su dung throw try-catch de tim loi 
+    try{
+        
+    cout<<" Nhap Phan So thu nhat: " ;
+    cin>> ps1 ;
+    
+    cout <<" Nhap Phan So thu hai: " ;
+    cin >> ps2 ;
+        
+    cout <<" Thuong cua hai phan so:" ;
+    ps3 = ps1 / ps2 ;
+    cout << ps3 << endl ;
+    }
+    catch(runtime_error& e){
+        cout << e.what() << endl ;
+        return 0 ;
+    }
+    cout <<" Tong cua hai phan so: ";
+    ps3 = ps1 + ps2 ;
+    cout << ps3 << endl ;
+    
+    cout <<" Hieu cua hai phan so: " ;
+    ps3 = ps1 - ps2 ;
+    cout << ps3 << endl ;
+    
+    cout <<" Tich cua hai phan so: " ;
+    ps3 = ps1 * ps2 ;
+    cout << ps3 << endl ;
+    
+    if( ps1 == ps2 ) cout <<" Hai phan so bang nhau " << endl ;
+    else if( ps1 > ps2 ) cout <<" phan so 1 lon hon phan so 2 " << endl ;
+    else if( ps1 < ps2) cout <<" Phan so 1 be hon phan so 2 " << endl ;
+
+    return 0;
+}
