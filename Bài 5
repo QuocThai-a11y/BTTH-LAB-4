@@ -1,1 +1,213 @@
+#ifndef DATHUC_H
+#define DATHUC_H
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class cDaThuc{
+    private:
+    // he so cua x^i
+    vector<double> dsHeSo ;
+    
+    public:
+    
+    cDaThuc( double hangso = 0){dsHeSo.push_back(hangso) ;} 
+    
+    void ChuanHoa() ;
+    
+    friend istream& operator>>(istream& is, cDaThuc& dt);
+    friend ostream& operator<<(ostream& os, const cDaThuc& dt);
+    
+    cDaThuc operator+(const cDaThuc& dt) const ;
+    cDaThuc operator-(const cDaThuc& dt) const ;
+    cDaThuc operator*(const cDaThuc& dt) const ;
+    
+    double GiaTri(double x) const ;
+    
+    cDaThuc operator*(double soThuc) const ;
+    friend cDaThuc operator*( double soThuc , const cDaThuc& dt) ;
+    
+    bool operator==(const cDaThuc& dt) const ;
+};
+#endif 
+
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+#include <cmath>
+#include "DaThuc.h"
+using namespace std;
+
+istream& operator>>(istream& is, cDaThuc& dt){
+    int soMu ;
+    cout <<" Nhap bac da thuc: " ;
+    is>> soMu ;
+    if(soMu < 0){
+        throw runtime_error(" Bac cua da thuc be hon 0 ") ;
+    }
+    cout <<" Nhap he so trong da thuc: " ;
+    dt.dsHeSo.resize(soMu+1) ;
+    for(int i = 0 ; i < dt.dsHeSo.size() ; i++){
+        is>> dt.dsHeSo[i] ;
+    }
+    return is ;
+}
+
+ostream& operator<<(ostream& os, const cDaThuc& dt){
+    if( dt.dsHeSo.empty()){
+        throw runtime_error(" Da Thuc rong ") ;
+    }
+    bool isFrist = true ;
+    
+    for(int i = dt.dsHeSo.size()-1 ; i >= 0 ; i ++){
+        if( abs(dt.dsHeSo[i]) < 1e-9 ) continue ;
+        
+        if(!isFrist) os << (dt.dsHeSo[i] > 0 ? "+":"-") ;
+        else if(dt.dsHeSo[i] < 0) os << "-" ;
+        
+        double HeSo = abs(dt.dsHeSo[i]) ;
+        if( i == 0 || HeSo != 1) os << HeSo ;
+        if( i > 0 ) os << "x" ;
+        if( i > 1) os << "^" << i;
+        
+        isFrist = false ;
+    }
+    if(isFrist) os <<"0" ;
+    return os ;
+}
+
+void cDaThuc::ChuanHoa() {
+    while (dsHeSo.size() > 1 && dsHeSo.back() < 1e-9) {
+        dsHeSo.pop_back();
+    }
+}
+
+cDaThuc cDaThuc::operator+(const cDaThuc& dt) const {
+    cDaThuc Ketqua ;
+    int max_size = max( this->dsHeSo.size() , dt.dsHeSo.size()) ;
+    Ketqua.dsHeSo.resize( max_size , 0.0) ;
+    
+    for( int i = 0 ; i < max_size ; i++){
+    if(i < this->dsHeSo.size()) Ketqua.dsHeSo[i] += this->dsHeSo[i] ;
+    if(i < dt.dsHeSo.size()) Ketqua.dsHeSo[i] += dt.dsHeSo[i] ;
+    }
+    // xoa he so 0 o bac cao nhat
+    Ketqua.ChuanHoa() ;
+    return Ketqua ;
+}
+
+cDaThuc cDaThuc::operator-(const cDaThuc& dt) const {
+    cDaThuc Ketqua ;
+    int max_size = max( this->dsHeSo.size() , dt.dsHeSo.size()) ;
+    
+    Ketqua.dsHeSo.resize( max_size ) ;
+    for( int i = 0 ; i < max_size ; i++){
+    if(i < this->dsHeSo.size()) Ketqua.dsHeSo[i] += this->dsHeSo[i] ;
+    if(i < dt.dsHeSo.size()) Ketqua.dsHeSo[i] -= dt.dsHeSo[i] ;
+    }
+    // xoa he so 0 o bac cao nhat
+    Ketqua.ChuanHoa() ;
+    return Ketqua ;
+}
+
+cDaThuc cDaThuc::operator*(const cDaThuc& dt) const {
+    cDaThuc Kq ;
+    int n = this->dsHeSo.size() ;
+    int m = dt.dsHeSo.size() ;
+    Kq.dsHeSo.resize( m + n - 1, 0.0) ;
+    for(int i = 0 ; i < n ; i++){
+        for(int j = 0 ; j < m ; j++)
+        Kq.dsHeSo[i+j] += this->dsHeSo[i] * dt.dsHeSo[j] ;
+    }
+    Kq.ChuanHoa() ;
+    return Kq ;
+}
+
+cDaThuc cDaThuc::operator*(double soThuc) const {
+    cDaThuc Kq ;
+    Kq.dsHeSo = this->dsHeSo ;
+    
+    for(int i = 0 ; i < Kq.dsHeSo.size(); i++){
+        Kq.dsHeSo[i] *= soThuc ;
+    }
+    Kq.ChuanHoa() ;
+    return Kq ;
+}
+cDaThuc operator*( double soThuc , const cDaThuc& dt){
+    return dt * soThuc ;
+}
+
+double cDaThuc::GiaTri(double x) const {
+    double sum = 0 ;
+    for(int i = 0 ; i < dsHeSo.size(); i++){
+        sum += dsHeSo[i] * pow( x, i) ;
+    }
+    return sum ;
+}
+
+bool cDaThuc::operator==(const cDaThuc& dt) const {
+    if( this->dsHeSo.size() == dt.dsHeSo.size() ){
+        for(int i = 0 ; i < dt.dsHeSo.size(); i++){
+            if(this->dsHeSo[i] != dt.dsHeSo[i]) 
+               return false;
+        }
+        
+    }
+    else return false ;
+    
+    return true ;
+}
+int main()
+{
+    cDaThuc dt1 ,dt2 ,dt3 ;
+    try{
+    cout <<" Nhap da thuc thu nhat: " ;
+    cin >> dt1 ;
+    cout << dt1 ;
+    cout<<"\n Nhap da thuc thu hai: " ;
+    cin >> dt2 ;
+    cout << dt2 ;
+    }
+    catch(runtime_error& e){
+        cout << "Loi: "<< e.what() << endl; 
+        return 0 ;
+    }
+    
+    if(dt1 == dt2) cout <<" hai da thuc bang nhau " << endl ;
+    else cout <<" Hai da thuc khong bang nhau " << endl ;
+    
+    cout<<" Tong cua hai da thuc: " ;
+    dt3 = dt1 + dt2 ;
+    cout << dt3 << endl;
+    
+    cout<<" Hieu cua hai da thuc: " ;
+    dt3 = dt1 - dt2 ;
+    cout << dt3 << endl ;
+    
+    cout<<" Tich cua hai da thuc: " ;
+    dt3 = dt1 * dt2 ;
+    cout << dt3 << endl ;
+    
+    double k ;
+    cout<<" Nhap gia tri k cho da thuc 1 va 2:";
+    cin >> k ;
+    cout<<" Gia tri cua da thuc 1 " <<"P(" << k <<"): " ;
+    cout << dt1.GiaTri(k) << endl ;
+    
+    cout<<" Gia tri cua da thuc 2 " <<"P(" << k <<"): " ;
+    cout<< dt2.GiaTri(k) << endl ;
+    
+    cout <<" Nhap so thuc bat ky: " ;
+    double soThuc ;
+    cin >> soThuc ;
+    cout <<" Tich cua da thuc 1 voi so thuc: " ;
+    dt3 = dt1 * soThuc ;
+    cout << dt3 << endl ;
+    
+    cout <<" Tich cua da thuc 2 voi so thuc: " ;
+    dt3 = dt2 * soThuc ;
+    cout << dt3 << endl ;
+    return 0;
+}
+#endif
 
