@@ -1,0 +1,129 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+#include <iostream>
+#include <vector>
+
+class cVector{
+    private:
+    
+    std::vector<double> dsVector ;
+    
+    public:
+    
+    friend std::istream& operator>>(std::istream& is, cVector& vt) ;
+    friend std::ostream& operator<<(std::ostream& os, const cVector& vt) ;
+    
+    cVector operator+(const cVector& vt) const ;
+    cVector operator-(const cVector& vt) const ;
+    
+    double dot(const cVector& vt) const ;
+    double KhoangCachVector( const cVector& vt) const ;
+    
+    friend cVector operator*(const double& k, const cVector& vt) ;
+    cVector operator*(const double& k) const ;
+    
+    cVector operator/(const double& k) const ;
+};
+#endif
+
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <stdexcept>
+#include "cVector.h"
+using namespace std;
+
+istream& operator>>(istream& is, cVector& vt){
+    int n ;
+    is >> n ;
+    vt.dsVector.resize(n, 0.0) ;
+    cout <<" Cac he so trong vector: " ;
+    for(int i = 0 ; i < n ; i++){
+        is >> vt.dsVector[i] ;
+    }
+    return is ;
+}
+
+ostream& operator<<(ostream& os, cVector& vt){
+    os <<"( " ;
+    for(int i = 0 ; i < vt.dsVector.size() ; i++){
+        os << vt.dsVector[i] ;
+        if( i < vt.dsVector[i] - 1) cout << ", ";
+    }
+    os <<" )" ;
+}
+
+cVector cVector::operator+(const cVector& vt) const{
+    cVector kq ;
+    int n = this->dsVector.size() ;
+    kq.dsVector.resize(n, 0.0) ;
+    
+    for(int i = 0 ; i < vt.dsVector.size(); i++){
+        kq.dsVector[i] = this->dsVector[i] + vt.dsVector[i] ;
+    }
+    return  kq ;
+}
+
+cVector cVector::operator-(const cVector& vt) const{
+    cVector kq ;
+    int n = this->dsVector.size() ;
+    kq.dsVector.resize(n, 0.0) ;
+    
+    for(int i = 0 ; i < vt.dsVector.size(); i++){
+        kq.dsVector[i] = this->dsVector[i] - vt.dsVector[i] ;
+    }
+    return  kq ;
+}
+
+cVector cVector::operator*(const double& k) const{
+    cVector kq ;
+    int n = this->dsVector.size() ;
+    kq.dsVector.resize(n, 0.0) ;
+    
+    for(int i = 0; i < this->dsVector[i]; i++){
+        kq.dsVector[i] = k * this->dsVector[i] ;
+    }
+    return kq ;
+}
+
+cVector operator*(const double& k, const cVector& vt){
+    return vt * k ;
+}
+
+cVector cVector::operator/(const double& k) const{
+    cVector kq ;
+    int n = this->dsVector.size() ;
+    kq.dsVector.resize(n, 0.0) ;
+    
+    if( k == 0){
+        throw runtime_error(" Khong the chia vector cho 0 ") ;
+    }
+    
+    for(int i = 0 ; i < this->dsVector.size(); i++){
+        kq.dsVector[i] = this->dsVector[i] / k ;
+    }
+    return kq ;
+}
+
+double cVector::dot(const cVector& vt) const{
+    double sum = 0 ;
+    for(int i = 0 ; i < dsVector.size(); i++){
+        sum += dsVector[i] + vt.dsVector[i] ;
+    }
+    return sum ;
+}
+
+double cVector::KhoangCachVector(const cVector& vt) const {
+    double sum = 0 ; 
+    for(int i = 0 ; i < dsVector.size(); i++){
+        sum = pow(dsVector[i], 2) + pow(vt.dsVector[i], 2) ;
+    }
+    return sqrt(sum) ;
+}
+
+int main()
+{
+    
+
+    return 0;
+}
